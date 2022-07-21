@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <style>
+            body {
+                background-color: black;
+                margin: 0;
+                padding: 0;
+                height: 50%;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript" src="https://niivue.github.io/niivue/features/niivue.umd.js"></script>
+        <!-- actual functional code to test loading capabilities-->
+        <script>
+
+            window.onload = function () {
+                document.body.addEventListener('dragover', onDragOver);
+                document.body.addEventListener('drop', onDrop);
+
+                //implementation of 3d view
+                let test1 = new niivue.Niivue();
+                test1.attachTo(`testCanvas1`);
+                test1.setSliceType(test1.sliceTypeRender);
+
+                //implementation of ax/sag/cor views
+                let acs_views = new niivue.Niivue()
+                acs_views.attachTo('testCanvas2')
+                acs_views.setSliceType(acs_views.sliceTypeRenderMultiplanar)
+                test1.syncWith(acs_views, {'3d': false, '2d':true})
+            };
+
+            function onDragOver(e) {
+                // stop browser processing right away
+                e.stopPropagation();
+                e.preventDefault();
+            };
+
+            //TODO
+            function onDrop(e) {
+                //var f = e.dataTransfer.files[i];
+
+            };
+        </script>
+
+        <canvas id='testCanvas1' height=480 width=640></canvas>
+        <canvas id='testCanvas2' height=480 width=480></canvas>
+
+
+    </body>
+</html> 
