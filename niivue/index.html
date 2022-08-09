@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <style>
+            body {
+                background-color: black;
+                margin: 0px;
+                padding: 0px;
+            }
+        </style>
+        <script type="text/javascript" src="https://niivue.github.io/niivue/features/niivue.umd.js"></script>
+        <!-- actual functional code to test loading capabilities-->
+        <script>
+
+            window.onload = function () {
+                document.body.addEventListener('dragover', onDragOver);
+
+                //instance of niivue
+                nv = new niivue.Niivue();
+                //attach object to viewer
+                nv.attachTo(`viewer`);
+                //set default view to coronal
+                nv.setSliceType(nv.sliceTypeCoronal);
+                
+            };
+
+            function onDragOver(e) {
+                // stop browser processing right away
+                e.stopPropagation();
+                e.preventDefault();
+            };
+
+
+
+            function changeview() {
+                //gets the viewer box text for calling the setslicetype 
+                var combobox = document.getElementById('view');
+                var selection = combobox.selectedOptions[0].outerText;
+
+                //variable for  calling the right slice/view type
+                var type = eval('nv.sliceType'+selection);
+
+                //sets nv to desired slice type
+                nv.setSliceType(type);
+            }
+
+            function draw() {
+                //brush tool CURRENTLY NOT WORKING NEEDS TO BE INSIDE ONLOAD
+                nv.setDrawingEnabled(1);
+            }
+
+
+
+        </script>
+
+    </head>
+    <body>
+        <!--create the selectview box (calls changeview() to work)-->
+        <select id='view' onclick='javascript:changeview()' style='position:absolute;top:2px;left:2px;z-index:1000;'>
+            <option value='axial'>Axial</option>
+            <option value='coronal' selected>Coronal</option>
+            <option value='sagittal'>Sagittal</option>
+        </select>
+        <canvas id="viewer" style="width: 100%; height:100%"></canvas>
+    </body>
+</html> 
+

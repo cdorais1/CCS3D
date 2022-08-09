@@ -1,0 +1,124 @@
+<html>
+<head>
+    <script type="text/javascript" src="cornerstone3d.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/cornerstone-wado-image-loader"></script>
+    <script type="text/javascript" src="https://unpkg.com/dicom-parser"></script>
+
+    <script>
+
+        cornerstoneWADOImageLoader.external.cornerstone = cornerstone3dCore;
+
+        window.onload = function () {
+            
+            document.body.addEventListener('dragover', onDragOver);
+            document.body.addEventListener('drop', onDrop);
+
+
+        }
+
+        async function run() {
+
+            await cornerstone3dCore.init();
+            await cornerstone3dTools.init();
+
+            setup();
+
+        };
+
+
+
+        function setup() {
+
+            renderingEngineId = 'r';
+            renderingEngine = new cornerstone3dCore.RenderingEngine(renderingEngineId);
+
+            viewportId = 'v';
+
+            element = document.getElementById('viewer');
+            element.oncontextmenu = (e) => e.preventDefault();
+
+            viewportInput = {
+                viewportId,
+                element,
+                type: cornerstone3dCore.Enums.ViewportType.STACK,
+            };
+
+
+            var T = cornerstone3dTools;
+            T.addTool(T.MagnifyTool);
+            T.addTool(T.StackScrollMouseWheelTool);
+            T.addTool(T.ZoomTool);
+
+            var g = T.ToolGroupManager.createToolGroup('t');
+            g.addTool(T.StackScrollMouseWheelTool.toolName);
+            g.addTool(T.ZoomTool.toolName);
+
+            g.setToolActive(T.ZoomTool.toolName, {
+              bindings: [
+                {
+                  mouseButton: T.Enums.MouseBindings.Secondary, // Right Click
+                },
+              ],
+            });
+            g.setToolActive(T.StackScrollMouseWheelTool.toolName);
+
+
+
+            renderingEngine.enableElement(viewportInput);
+
+            g.addViewport(viewportId, renderingEngineId);
+
+        };
+
+
+
+        function onDragOver(e) {
+
+            // stop browser processing right away
+            e.stopPropagation();
+            e.preventDefault();
+
+        };
+
+
+
+        function onDrop(e) {
+
+            e.stopPropagation();
+            e.preventDefault();
+
+            files = e.dataTransfer.files;
+
+            imageIds = [];
+            for(f in files) {
+                imageIds.push(cornerstoneWADOImageLoader.wadouri.fileManager.add(files[f]));
+            }
+
+            load_volume();
+
+        }
+
+
+
+        async function load_volume() {
+
+            var viewport = renderingEngine.getViewport(viewportId);
+
+            // var stack = { currentImageIdIndex: 0, imageIds: imageIds };
+
+            viewport.setStack(imageIds);
+
+            viewport.render();
+            
+        }
+
+
+
+        run();
+        
+    </script>
+</head>
+<body style='margin:0px;padding:0px;background:black'>
+    <div id="viewer" style="width: 100%; height:100%"></div>
+</body>
+</html>
